@@ -1,86 +1,87 @@
-# Letheo — Cognitive Runtime de memoria para agentes
+# Letheo — a Cognitive Runtime for agent memory
 
-> **Letheo no es una base de datos. Es un *Cognitive Runtime*** — un organismo que respira
-> (procesa / comprime) y olvida. No "almacena y consulta"; **percibe, sueña, evoca y desvanece**.
+> **Letheo is not a database. It's a *Cognitive Runtime*** — an organism that breathes
+> (processes / compresses) and forgets. It doesn't "store and query"; it **perceives, dreams,
+> evokes, and fades**.
 
-Cuando el historial de un agente crece, las memorias ingenuas fallan a presupuesto de tokens fijo:
-meter todo el pasado al prompt (coste sin techo), resumir con un LLM en cada paso (coste **O(N)**), o
-RAG — que recupera hechos puntuales pero es **ciego al tiempo**: no sabe que algo *cambió*. Letheo
-destila el comportamiento en una estructura de **tamaño fijo**, leíble a **coste constante**, sea el
-historial de 4.000 o 1.000.000 de eventos.
+When an agent's history grows, naive memories break at a fixed token budget: stuff the whole past
+into the prompt (unbounded cost), re-summarize with an LLM every step (cost **O(N)**), or RAG — which
+retrieves point facts but is **blind to time**: it doesn't know that something *changed*. Letheo
+distills behaviour into a **fixed-size** structure read at **constant cost**, whether the history is
+4,000 or 1,000,000 events.
 
-El **olvido estratégico es una feature**, no un bug: el peso de cada recuerdo decae por física
-(entropía temporal) y solo el patrón sobrevive. El destino del motor es ser la **memoria de una flota
-de super-agentes**: una sola física de decaimiento sobre **dos capas** — episódica (hechos exactos,
-hipocampo) y semántica (identidad/trayectoria, neocórtex).
+**Strategic forgetting is a feature, not a bug**: each memory's weight decays by physics (temporal
+entropy) and only the pattern survives. The engine is built to be the **memory of a fleet of
+super-agents**: a single decay physics over **two layers** — episodic (exact facts, hippocampus) and
+semantic (identity / trajectory, neocortex).
 
-## Los verbos (MQL — *Mnemonic Query Language*)
+## The verbs (MQL — *Mnemonic Query Language*)
 
-No hay `SELECT / INSERT / UPDATE / DELETE`. El vocabulario es biológico:
+There is no `SELECT / INSERT / UPDATE / DELETE`. The vocabulary is biological:
 
-| Verbo | Función |
-|-------|---------|
-| `PERCEIVE` | Asimila un estímulo crudo en memoria volátil de corto plazo. Nace decayendo. |
-| `DISTILL`  | El "sueño": colapsa N percepciones en un *Vector de Intención* + sus **modos** (compresión multi-modal). |
-| `EVOKE`    | Recuerda por **resonancia semántica** dentro de un *token budget*; `RESONATING WITH` enfoca un rasgo. |
-| `FADE`     | Olvido estratégico modulado por entropía; preserva la contribución ya hecha al arquetipo. |
-| `IMPRINT`  | Consolida/ancla un arquetipo resistente al olvido. |
-| `RECALL`   | Capa-1: recuperación dirigida de **hechos exactos** (verbatim), read-only. |
-| `REINFORCE`| Capa-1: spaced-repetition — recuerda y resetea el decay de un hecho. |
+| Verb | Role |
+|------|------|
+| `PERCEIVE` | Take in a raw stimulus into volatile short-term memory. It is born decaying. |
+| `DISTILL`  | The "dream": collapse N perceptions into an *Intention Vector* + its **modes** (multi-modal compression). |
+| `EVOKE`    | Recall by **semantic resonance** within a token budget; `RESONATING WITH` focuses on a trait. |
+| `FADE`     | Strategic forgetting modulated by entropy; preserves the contribution already made to the archetype. |
+| `IMPRINT`  | Consolidate / anchor an archetype against forgetting. |
+| `RECALL`   | Layer-1: directed retrieval of **exact facts** (verbatim), read-only. |
+| `REINFORCE`| Layer-1: spaced repetition — recall and reset a fact's decay. |
 
-## El tiempo como coeficiente de entropía
+## Time as a coefficient of entropy
 
-El tiempo no es un timestamp; es un operador pasivo sobre el peso de cada recuerdo:
+Time is not a timestamp; it's a passive operator on each memory's weight:
 
 ```
 weight(t) = salience · e^(−λ · Δt) · (1 + reinforcement)        λ = ln2 / halflife
 ```
 
-Δt se mide desde la **última evocación/refuerzo** (recordar resetea Δt → permanencia ganada). El peso
-se evalúa **perezosamente** (lazy): solo en `DISTILL`, `EVOKE` o durante el barrido del GC semántico —
-nunca por tic de reloj. El refuerzo tiene **rendimientos decrecientes** y la vida media un **suelo**:
-nada se vuelve inmortal por mucho que se reviste.
+Δt is measured from the **last evocation/reinforcement** (recalling resets Δt → earned permanence).
+Weight is evaluated **lazily**: only during `DISTILL`, `EVOKE`, or the semantic GC sweep — never per
+clock tick. Reinforcement has **diminishing returns** and the half-life has a **floor**: nothing
+becomes immortal no matter how often it's revisited.
 
-## Las dos capas (Complementary Learning Systems)
+## The two layers (Complementary Learning Systems)
 
-Una sola física (`EntropyTrace`) gobierna las dos representaciones de la memoria:
+A single physics (`EntropyTrace`) governs both representations of memory:
 
-- **Capa-2 · semántica** (`archetype` + `modes`): la identidad y la **trayectoria** del sujeto,
-  descompuesta en **modos** de comportamiento (no una media ciega). Cada modo tiene su propia física de
-  olvido **y su propio drift** (cuánto ha cambiado ese comportamiento desde que nació). Comprime, O(1).
-- **Capa-1 · episódica** (`factstore`): hechos **verbatim** con embedding, dedup semántico y olvido.
-  Responde lo nominal exacto que la capa-2 nunca guardaría.
+- **Layer-2 · semantic** (`archetype` + `modes`): the subject's identity and **trajectory**, decomposed
+  into behavioural **modes** (not a blind average). Each mode has its own forgetting physics **and its
+  own drift** (how far that behaviour has shifted since it was born). Compresses, O(1).
+- **Layer-1 · episodic** (`factstore`): **verbatim** facts with an embedding, semantic dedup, and
+  forgetting. Answers the exact, nominal thing that layer-2 would never store.
 
-`EVOKE` **unificado** responde **carácter Y nominal** en una sola evocación, repartiendo un único
-presupuesto de tokens entre ambas capas.
+The **unified** `EVOKE` answers **character AND nominal** in a single evocation, splitting one token
+budget across both layers.
 
-## Uso (Python)
+## Usage (Python)
 
 ```python
 from letheo_orchestration import Session
 
 s = Session()
 
-# Capa-2: percibe y "sueña" → la esencia (identidad + trayectoria, a coste fijo)
+# Layer-2: perceive and "dream" → the essence (identity + trajectory, at fixed cost)
 for _ in range(20):
     s.perceive("user:ada", act="reads sci-fi novels at night")
 s.breathe()
 
-# Capa-1: un hecho exacto, verbatim
+# Layer-1: an exact, verbatim fact
 s.remember("user:ada", "allergic to penicillin")
 
-# Una sola evocación responde carácter (gist) Y nominal (hechos)
+# A single evocation answers character (gist) AND nominal (facts)
 ctx = s.evoke_unified("user:ada", "what does ada read?")
 print(s.recall("user:ada", "allergies", k=1))     # [('allergic to penicillin', ...)]
 
-# Memoria generativa: insights del arco (transiciones, revivals)
+# Generative memory: insights from the arc (transitions, revivals)
 print(s.reflect("user:ada"))
 
-# Búsqueda por similitud entre sujetos (ANN a escala): enruta al más relevante
+# Similarity search across subjects (ANN at scale): route to the most relevant one
 print(s.resonate("space opera fan", k=3))
 ```
 
-…o el mismo motor como **MQL**:
+…or the same engine as **MQL**:
 
 ```
 PERCEIVE interaction FROM subject "user:ada" AS { act: reads, genre: scifi }
@@ -89,32 +90,32 @@ EVOKE    essence OF "user:ada" RESONATING WITH { nostalgia } WITHIN budget 800 t
 RECALL   facts FROM subject "user:ada" RESONATING WITH { allergy } WHERE resonates > 0.6 WITHIN k 3
 ```
 
-## Arquitectura
+## Architecture
 
-- **`crates/letheo-core`** (Rust): física del olvido, percepción, síntesis multi-modal, arquetipos, factstore, evoke unificado, reflexión, runtime.
-- **`crates/letheo-inference`** (Rust): trait `Provider` + `CandleProvider` (`all-MiniLM-L6-v2`, local).
-- **`crates/letheo-mql`** + **`crates/letheo-exec`** (Rust): lexer + parser de los verbos → AST → ejecutor.
-- **`crates/letheo-index`** (Rust): índice ANN (HNSW) + `Retriever` Flat/HNSW con filtrado por vida.
-- **`crates/letheo-{async,persist,calibration,cli}`** (Rust): runtime actor Tokio, persistencia (JSON + store embebido `redb`), calibración de umbrales, REPL MQL.
-- **`bindings/letheo-py`** (PyO3) + **`orchestration/`** (Python): SDK de alto nivel (`Session`, prosa, tiktoken).
+- **`crates/letheo-core`** (Rust): forgetting physics, perception, multi-modal synthesis, archetypes, factstore, unified evoke, reflection, runtime.
+- **`crates/letheo-inference`** (Rust): `Provider` trait + `CandleProvider` (`all-MiniLM-L6-v2`, local).
+- **`crates/letheo-mql`** + **`crates/letheo-exec`** (Rust): lexer + parser for the verbs → AST → executor.
+- **`crates/letheo-index`** (Rust): ANN index (HNSW) + `Retriever` (Flat/HNSW with life-filtering).
+- **`crates/letheo-{async,persist,calibration,cli}`** (Rust): Tokio actor runtime, persistence (JSON + embedded `redb` store), threshold calibration, MQL REPL.
+- **`bindings/letheo-py`** (PyO3) + **`orchestration/`** (Python): high-level SDK (`Session`, prose, tiktoken).
 
 ```
-crates/ + bindings/   →  MOTOR (Rust)            percibe · sueña · evoca · olvida
-orchestration/        →  SDK Python (Session)    capa consumidora del binding
+crates/ + bindings/   →  ENGINE (Rust)           perceive · dream · evoke · forget
+orchestration/        →  Python SDK (Session)    consumer layer over the binding
 ```
 
-## Instalación
+## Install
 
 ```bash
-# 1) Motor (offline, hermético) — sin red, sin modelo:
+# 1) Engine (offline, hermetic) — no network, no model:
 cargo test --workspace
 
-# 2) Binding Python (requiere maturin + el modelo local en .models/):
+# 2) Python binding (needs maturin + the local model in .models/):
 maturin develop -m bindings/letheo-py/Cargo.toml --features candle
 ```
 
-El `CandleProvider` carga `all-MiniLM-L6-v2` **desde disco** (local-first; no lo descarga en runtime).
-Colócalo una vez y apunta `LETHEO_MODEL_DIR` ahí:
+`CandleProvider` loads `all-MiniLM-L6-v2` **from disk** (local-first; it does not download at runtime).
+Place it once and point `LETHEO_MODEL_DIR` at it:
 
 ```bash
 git lfs install
@@ -122,17 +123,20 @@ git clone https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2 .models/
 export LETHEO_MODEL_DIR="$PWD/.models/all-MiniLM-L6-v2"
 ```
 
-Candle lee la config, el tokenizer y los pesos en **safetensors**. El workspace de Rust
-(`cargo test --workspace`) es **hermético**: no necesita el modelo — solo el binding Python lo requiere.
+Candle reads the config, tokenizer, and weights in **safetensors**. The Rust workspace
+(`cargo test --workspace`) is **hermetic**: it doesn't need the model — only the Python binding does.
 
-Ver [`docs/`](docs/) para la física, la gramática EBNF y el pipeline; el **porqué** del proyecto en
-[`docs/10-thesis-agents-need-memory.md`](docs/10-thesis-agents-need-memory.md); y [`ROADMAP.md`](ROADMAP.md)
-para el estado y lo que sigue.
+See [`docs/`](docs/) for the physics, the EBNF grammar, and the pipeline; the **why** of the project in
+[`docs/10-thesis-agents-need-memory.md`](docs/10-thesis-agents-need-memory.md); and [`ROADMAP.md`](ROADMAP.md)
+for the status and what's next.
 
-## Estado
+> Note: the in-repo docs and code comments are currently in Spanish; the engine, API, and this README
+> are the canonical English surface.
 
-Motor (Rust) maduro y testeado offline: **`cargo test --workspace` → 144 passed, 0 failed, 2 ignored,
-0 warnings**. Arquetipo multi-modal con trayectoria por-modo, retrieval físico, bicapa episódica
-unificada, índice ANN a escala, memoria generativa, persistencia transaccional — bajo el invariante
-**VERDAD 100%** (cero mock/fake/hardcode en el camino de producto; auditoría en
+## Status
+
+Engine (Rust), mature and tested offline: **`cargo test --workspace` → 144 passed, 0 failed, 2 ignored,
+0 warnings**. Multi-modal archetype with per-mode trajectory, physical retrieval, unified episodic
+two-layer memory, ANN index at scale, generative memory, transactional persistence — under the
+**TRUTH 100%** invariant (zero mock/fake/hardcode on the product path; audit in
 [`docs/05-honest-assessment.md`](docs/05-honest-assessment.md)).
