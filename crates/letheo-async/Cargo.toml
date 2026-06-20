@@ -1,0 +1,21 @@
+[package]
+name = "letheo-async"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+description = "Runtime asíncrono: el organismo respira solo (Tokio + GC semántico de fondo)."
+
+[dependencies]
+letheo-core = { path = "../letheo-core" }
+letheo-inference = { path = "../letheo-inference" }
+tokio = { version = "1", features = ["rt", "sync", "time", "macros"] }
+
+[dev-dependencies]
+tokio = { version = "1", features = ["rt", "sync", "time", "macros", "test-util"] }
+# MockProvider (doble determinista) solo para los tests; no entra en el build normal.
+letheo-inference = { path = "../letheo-inference", features = ["testing"] }
+
+[lib]
+name = "letheo_async"
+path = "src/lib.rs"

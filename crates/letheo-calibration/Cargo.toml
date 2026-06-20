@@ -1,0 +1,18 @@
+[package]
+name = "letheo-calibration"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+description = "Sweep empírico de los umbrales (θ_fade / θ_redundancia / θ_anomalía) con frontera de Pareto."
+
+[dependencies]
+letheo-core = { path = "../letheo-core" }
+
+[lib]
+name = "letheo_calibration"
+path = "src/lib.rs"
+
+[[bin]]
+name = "sweep"
+path = "src/main.rs"

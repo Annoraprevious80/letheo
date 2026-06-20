@@ -1,0 +1,4 @@
+letheo
+
+[llm]
+openai>=1.40

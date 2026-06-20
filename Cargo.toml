@@ -1,0 +1,25 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/letheo-core",
+    "crates/letheo-inference",
+    "crates/letheo-mql",
+    "crates/letheo-exec",
+    "crates/letheo-async",
+    "crates/letheo-calibration",
+    "crates/letheo-persist",
+    "crates/letheo-cli",
+    "crates/letheo-index",
+]
+# letheo-py se excluye del workspace: requiere Python (PyO3) y se construye con maturin.
+# Así `cargo test --workspace` permanece hermético/offline para el core.
+exclude = ["bindings/letheo-py"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+authors = ["Letheo — Cognitive Runtime"]
+
+[workspace.dependencies]
+# Local-first: no network deps in the core. Kept intentionally minimal for the MVP.

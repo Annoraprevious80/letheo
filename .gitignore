@@ -1,0 +1,24 @@
+# Rust
+/target
+**/target
+Cargo.lock
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Node / frontend deps
+**/node_modules/
+
+# Modelos descargados (local-first; all-MiniLM-L6-v2 para CandleProvider)
+.models/
+.env
+
+# Datasets reales y cachés (no versionar — mantener el repo limpio)
+/data/
+*.parquet
+
+# Logs
+*.log

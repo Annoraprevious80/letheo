@@ -1,0 +1,81 @@
+(* ============================================================
+   MQL — Mnemonic Query Language · Gramática formal (EBNF)
+   Cognitive Runtime. NO existe SELECT/INSERT/UPDATE/DELETE.
+   Siete verbos: PERCEIVE · DISTILL · EVOKE · FADE · IMPRINT
+                 · RECALL · REINFORCE (capa-1 episódica)
+   ============================================================ *)
+
+program        = { statement } ;
+statement      = ( perceive | distill | evoke | fade | imprint | recall | reinforce ) ;
+
+(* --- PERCEIVE: asimilar un estímulo crudo (corto plazo) --- *)
+perceive       = "PERCEIVE" , "interaction" ,
+                 "FROM" , "subject" , subject_ref ,
+                 "AS" , trait_map ,
+                 [ "WITH" , "salience" , number ] ,
+                 [ "DECAYS" , "halflife" , duration ] ;
+
+(* --- DISTILL: el "sueño" / compresión semántica --- *)
+distill        = "DISTILL" , "subject" , subject_ref ,
+                 [ "FROM" , "perceptions" , [ "WHERE" , predicate ] ] ,
+                 "INTO" , "intention_vector" ,
+                 [ "COMPRESSING" , "BY" , "semantic_variance" ] ,
+                 [ "RETAINING" , trait_set ] ;
+
+(* --- EVOKE: resonancia semántica con token budget --- *)
+evoke          = "EVOKE" , ( "essence" | "archetype" ) ,
+                 "OF" , subject_ref ,
+                 [ "ACROSS" , "span" , duration ] ,
+                 [ "RESONATING" , "WITH" , trait_set ] ,
+                 [ "RESOLUTION" , ( "arc" | "point" | "summary" ) ] ,
+                 [ "PROJECTING" , ( "trajectory" | "snapshot" ) ] ,
+                 [ "WITHIN" , "budget" , number , "tokens" ] ,
+                 [ "RETURN" , "compressed_context" ] ;
+
+(* --- FADE: olvido estratégico --- *)
+fade           = "FADE" , ( "noise" | "interaction" ) ,
+                 [ "WHERE" , predicate ] ,
+                 [ "PRESERVING" , "archetype_contribution" ] ;
+
+(* --- IMPRINT: consolidar/anclar la esencia de largo plazo (refuerza su física) --- *)
+imprint        = "IMPRINT" , "archetype" , string ,
+                 "FROM" , "intention_vector" ,
+                 [ "RESILIENCE" , ( "low" | "medium" | "high" ) ] ;
+
+(* --- RECALL: recuperación dirigida de hechos episódicos (capa-1), sin pérdida y read-only --- *)
+recall         = "RECALL" , "facts" , "FROM" , "subject" , subject_ref ,
+                 [ "RESONATING" , "WITH" , trait_set ] ,
+                 [ "WHERE" , predicate ] ,
+                 [ "WITHIN" , "k" , number ] ;
+
+(* --- REINFORCE: refuerzo / spaced-repetition de hechos (resetea su decay) --- *)
+reinforce      = "REINFORCE" , "facts" , "FROM" , "subject" , subject_ref ,
+                 [ "RESONATING" , "WITH" , trait_set ] ,
+                 [ "WITHIN" , "k" , number ] ;
+
+(* --- componentes compartidos --- *)
+subject_ref    = string ;                       (* p.ej. "user:Xolotl" *)
+trait_map      = "{" , [ trait_kv , { "," , trait_kv } ] , "}" ;
+trait_kv       = identifier , ":" , value ;
+trait_set      = "{" , [ identifier , { "," , identifier } ] , "}" ;
+
+(* Predicado real (épica 9.0): booleano con precedencia OR < AND < NOT < comparación. *)
+predicate      = and_expr , { "OR" , and_expr } ;
+and_expr       = not_expr , { "AND" , not_expr } ;
+not_expr       = "NOT" , not_expr | atom ;
+atom           = "(" , predicate , ")" | comparison ;
+(* Sin comparador ⇒ igualdad implícita: `domain "ecommerce"` ≡ `domain == "ecommerce"`. *)
+comparison     = field , [ comparator ] , value ;
+(* `resonates`/`resonance` = coseno del ítem con la consulta RESONATING WITH (predicado vectorial). *)
+field          = "weight" , [ "now" ] | "salience" | "age" | "resonates" | "resonance" | identifier ;
+comparator     = "<" | "<=" | ">" | ">=" | "==" | "=" | "!=" ;
+
+value          = string | number | identifier ;
+duration       = number , ( "m" | "h" | "d" | "w" | "y"
+                          | "min" | "hour" | "day" | "week" | "month" | "year" ) ;
+
+identifier     = letter , { letter | digit | "_" } ;
+string         = '"' , { character - '"' } , '"' ;
+number         = digit , { digit } , [ "." , { digit } ] ;
+letter         = "A".."Z" | "a".."z" ;
+digit          = "0".."9" ;
