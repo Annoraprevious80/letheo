@@ -3,7 +3,7 @@
 Letheo is a **Cognitive Runtime** — a memory engine that perceives, distills, evokes and *forgets*.
 Contributions are welcome. A few invariants keep it trustworthy:
 
-## The non-negotiable: VERDAD 100%
+## The non-negotiable:
 **No mocks, fakes, hardcodes, proxies or placeholders in the product path.** If a number can't be
 measured, it's declared as an approximation (e.g. token counts), never invented. Test doubles live
 only in tests, never beside real code. A PR that fakes a result will be rejected even if green.
